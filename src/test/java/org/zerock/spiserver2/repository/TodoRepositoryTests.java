@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.zerock.spiserver2.domain.Todo;
 
+
+
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -78,5 +80,9 @@ public class TodoRepositoryTests {
         log.info(result.getTotalElements());
         log.info(result.getContent());
 
+    }
+    @Test
+    public  void testSearch1(){
+        todoRepository.search1();
     }
 }
