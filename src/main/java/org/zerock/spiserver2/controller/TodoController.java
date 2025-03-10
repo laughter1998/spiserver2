@@ -11,6 +11,7 @@ import org.zerock.spiserver2.service.TodoService;
 
 import java.util.Map;
 
+
 @RestController
 @Log4j2
 @RequiredArgsConstructor
@@ -42,5 +43,22 @@ public class TodoController {
         long tno = todoService.register(dto);
 
         return Map.of("TNO", tno);
+    }
+
+    @PutMapping("/{tno}")
+    public  Map<String, String> modify(@PathVariable("tno") Long tno,
+                                       @RequestBody TodoDTO todoDTO){
+        todoDTO.setTno(tno);
+
+        todoService.modify(todoDTO);
+        return Map.of("RESULT", "SUCCESS");
+
+    }
+
+    @DeleteMapping("/{tno}")
+    public  Map<String, String> remove(@PathVariable Long tno){
+        todoService.remove(tno);
+
+        return Map.of("RESULT", "SECCESS");
     }
 }

@@ -35,7 +35,7 @@ public class TodoRepositoryTests {
             Todo todo = Todo.builder()
                     .title("Title.."+ i)
                     .content("Content..."+ i)
-                    .dueDate(LocalDate.of(2023,12,30))
+                    .dueDate(LocalDate.of(2025,3,10))
                     .build();
 
             Todo result = todoRepository.save(todo);
