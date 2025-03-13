@@ -1,0 +1,37 @@
+package org.zerock.spiserver2.controller;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.zerock.spiserver2.dto.ProductDTO;
+import org.zerock.spiserver2.util.CustomFileUtil;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.web.bind.annotation.PostMapping;
+
+
+
+@RestController
+@Log4j2
+@RequiredArgsConstructor
+@RequestMapping("/api/products")
+public class ProductContoller {
+
+    private final CustomFileUtil fileUtil;
+
+    @PostMapping("/")
+    public Map<String, String> register(ProductDTO productDTO){
+        log.info("register:" + productDTO);
+        List<MultipartFile> files = productDTO.getFiles();
+        List<String> uploadedFileNames = fileUtil.saveFiles(files);
+        productDTO.setUploadFileNames(uploadedFileNames);
+        log.info(uploadedFileNames);
+        return Map.of("RESULT", "SUCCESS");
+    }
+    
+}
