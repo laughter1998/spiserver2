@@ -2,7 +2,6 @@ package org.zerock.spiserver2.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.http.HttpHeaders;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,15 +12,16 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.zerock.spiserver2.config.CustomServletConfig;
+import org.zerock.spiserver2.controller.advice.CustomcontrollerAdvice;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.coobird.thumbnailator.Thumbnails;
-
 
 
 @Component
@@ -29,8 +29,17 @@ import net.coobird.thumbnailator.Thumbnails;
 @RequiredArgsConstructor
 public class CustomFileUtil {
 
+    private final CustomcontrollerAdvice customcontrollerAdvice;
+
+    private final CustomServletConfig customServletConfig;
+
     @Value("${org.zerock.upload.path}")
     private String uploadPath;
+
+    CustomFileUtil(CustomServletConfig customServletConfig, CustomcontrollerAdvice customcontrollerAdvice) {
+        this.customServletConfig = customServletConfig;
+        this.customcontrollerAdvice = customcontrollerAdvice;
+    }
 
     @PostConstruct
     public void init(){
@@ -98,6 +107,25 @@ public class CustomFileUtil {
         
         return ResponseEntity.ok().headers(headers).body(resource);
        
+
+    }
+
+    public void deleteFiles(List<String> fileNames){
+        if(fileNames == null || fileNames.size() == 0){return;}
+
+        fileNames.forEach(fileName -> {
+            String thumbnailFileName = "s_"+fileName;
+            Path tunmbnailPath = Paths.get(uploadPath, thumbnailFileName);
+            Path filePath = Paths.get(uploadPath, fileName);
+
+            try {
+                Files.deleteIfExists(filePath);
+                Files.deleteIfExists(thumbnailFileName);
+            } catch(IOException e){
+                throw new RuntimeException(e.getMessage());
+            }
+            
+        });
 
     }
 }
