@@ -30,21 +30,15 @@ import net.coobird.thumbnailator.Thumbnails;
 public class CustomFileUtil {
 
     private final CustomcontrollerAdvice customcontrollerAdvice;
-
     private final CustomServletConfig customServletConfig;
 
     @Value("${org.zerock.upload.path}")
     private String uploadPath;
 
-    CustomFileUtil(CustomServletConfig customServletConfig, CustomcontrollerAdvice customcontrollerAdvice) {
-        this.customServletConfig = customServletConfig;
-        this.customcontrollerAdvice = customcontrollerAdvice;
-    }
-
     @PostConstruct
-    public void init(){
+    public void init() {
         File tempFolder = new File(uploadPath);
-        if(!tempFolder.exists()) {
+        if (!tempFolder.exists()) {
             tempFolder.mkdirs();
         }
 
@@ -54,78 +48,68 @@ public class CustomFileUtil {
     }
 
     public List<String> saveFiles(List<MultipartFile> files) throws RuntimeException {
-
-        if(files == null || files.size() == 0){
+        if (files == null || files.size() == 0) {
             return null;
         }
 
         List<String> uploadNames = new ArrayList<>();
 
-        for(MultipartFile file: files){
-            String savedName = UUID.randomUUID().toString()+"_"+ file.getOriginalFilename();
-
+        for (MultipartFile file : files) {
+            String savedName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
             Path savePath = Paths.get(uploadPath, savedName);
 
             try {
-                Files.copy(file.getInputStream(), savePath); //원본 파일 업로드
+                Files.copy(file.getInputStream(), savePath); // 원본 파일 업로드
 
                 String contentType = file.getContentType();
-
-                if(contentType != null || contentType.startsWith("image")){
+                if (contentType != null && contentType.startsWith("image")) {
                     Path thumbnailPath = Paths.get(uploadPath, "s_" + savedName);
                     Thumbnails.of(savePath.toFile()).size(200, 200).toFile(thumbnailPath.toFile());
                 }
 
-
                 uploadNames.add(savedName);
             } catch (IOException e) {
                 throw new RuntimeException(e);
-                // TODO: handle exception
             }
-            
-
         }
 
         return uploadNames;
-        
     }
 
-    public ResponseEntity<Resource> getFile(String fileName){
-        Resource resource = new FileSystemResource(uploadPath+File.separator+fileName);
+    public ResponseEntity<Resource> getFile(String fileName) {
+        Resource resource = new FileSystemResource(uploadPath + File.separator + fileName);
 
-        if(!resource.isReadable()){
-            resource = new FileSystemResource(uploadPath+File.separator+"default.jpeg");
-
+        if (!resource.isReadable()) {
+            resource = new FileSystemResource(uploadPath + File.separator + "default.jpeg");
         }
+
         HttpHeaders headers = new HttpHeaders();
         try {
             headers.add("Content-Type", Files.probeContentType(resource.getFile().toPath()));
         } catch (IOException e) {
-            // TODO: handle exception
             throw new RuntimeException(e);
         }
-        
-        return ResponseEntity.ok().headers(headers).body(resource);
-       
 
+        return ResponseEntity.ok().headers(headers).body(resource);
     }
 
-    public void deleteFiles(List<String> fileNames){
-        if(fileNames == null || fileNames.size() == 0){return;}
+    public void deleteFiles(List<String> fileNames) {
+        if (fileNames == null || fileNames.size() == 0) {
+            return;
+        }
 
         fileNames.forEach(fileName -> {
-            String thumbnailFileName = "s_"+fileName;
-            Path tunmbnailPath = Paths.get(uploadPath, thumbnailFileName);
+            String thumbnailFileName = "s_" + fileName;
+            Path thumbnailPath = Paths.get(uploadPath, thumbnailFileName);
             Path filePath = Paths.get(uploadPath, fileName);
 
             try {
                 Files.deleteIfExists(filePath);
-                Files.deleteIfExists(thumbnailFileName);
-            } catch(IOException e){
+                Files.deleteIfExists(thumbnailPath);
+            } catch (IOException e) {
                 throw new RuntimeException(e.getMessage());
             }
-            
         });
-
     }
 }
+
