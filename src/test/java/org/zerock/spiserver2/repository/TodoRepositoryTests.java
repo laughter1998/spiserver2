@@ -57,6 +57,7 @@ public class TodoRepositoryTests {
         log.info(todo);
     }
 
+  
     @Test
     public  void testUpdate(){
         //먼저 로딩 하고  엔티티 객체를 변경
