@@ -3,7 +3,10 @@ package org.zerock.spiserver2.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.zerock.spiserver2.dto.PageRequestDTO;
+import org.zerock.spiserver2.dto.PageResponseDTO;
 import org.zerock.spiserver2.dto.ProductDTO;
+import org.zerock.spiserver2.service.ProductService;
 import org.zerock.spiserver2.util.CustomFileUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -17,6 +20,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -29,6 +34,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class ProductContoller {
 
     private final CustomFileUtil fileUtil;
+
+    private final ProductService productService;
 
     @PostMapping("/")
     public Map<String, String> register(ProductDTO productDTO){
@@ -44,6 +51,12 @@ public class ProductContoller {
     public ResponseEntity<Resource> viewFileGet(@PathVariable("fileName") String fileName){
         return fileUtil.getFile(fileName);
     }
+
+    @GetMapping("/list")
+    public PageResponseDTO<ProductDTO> List(PageRequestDTO pageRequestDTO){
+        return productService.getList(pageRequestDTO);
+    }
+    
     
     
 }
