@@ -85,6 +85,30 @@ public class ProductServiceImpl implements  ProductService{
         return entityDTO(product);
     }
 
+    @Override
+    public void modify(ProductDTO productDTO){
+        Optional<Product> result = productRepository.findById(productDTO.getPno());
+
+        Product product = result.orElseThrow();
+
+        product.changePrice(productDTO.getPrice());
+        product.changeName(productDTO.getPname());
+        product.changeDesc(productDTO.getPdesc());
+        product.changeDel(product.isDelFlag());
+
+        List<String> uploadFileNames = productDTO.getUploadFileNames();
+
+        product.clearList();
+
+        if(uploadFileNames != null && !uploadFileNames.isEmpty()){
+            uploadFileNames.forEach(uploadName -> {
+                product.addImageString(uploadName);
+            });
+        }
+
+        productRepository.save(product);
+    }
+
     private ProductDTO entityDTO(Product product){
 
         ProductDTO productDTO = ProductDTO.builder()
@@ -127,5 +151,11 @@ public class ProductServiceImpl implements  ProductService{
         });
 
         return product;
+    }
+
+    @Override
+    public void modify(ProductDTO productDTO) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'modify'");
     }
 }
