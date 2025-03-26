@@ -21,6 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 
@@ -37,15 +39,15 @@ public class ProductContoller {
 
     private final ProductService productService;
 
-    @PostMapping("/")
-    public Map<String, String> register(ProductDTO productDTO){
-        log.info("register:" + productDTO);
-        List<MultipartFile> files = productDTO.getFiles();
-        List<String> uploadedFileNames = fileUtil.saveFiles(files);
-        productDTO.setUploadFileNames(uploadedFileNames);
-        log.info(uploadedFileNames);
-        return Map.of("RESULT", "SUCCESS");
-    }
+    // @PostMapping("/")
+    // public Map<String, String> register(ProductDTO productDTO){
+    //     log.info("register:" + productDTO);
+    //     List<MultipartFile> files = productDTO.getFiles();
+    //     List<String> uploadedFileNames = fileUtil.saveFiles(files);
+    //     productDTO.setUploadFileNames(uploadedFileNames);
+    //     log.info(uploadedFileNames);
+    //     return Map.of("RESULT", "SUCCESS");
+    // }
 
     @GetMapping("/view/{fileName}")
     public ResponseEntity<Resource> viewFileGet(@PathVariable("fileName") String fileName){
@@ -57,6 +59,23 @@ public class ProductContoller {
         return productService.getList(pageRequestDTO);
     }
     
+    @PostMapping("/")
+    public Map<String, Long> register(ProductDTO productDTO){
+        List<MultipartFile> files = productDTO.getFiles();
+
+        List<String> uploadFileNames =  fileUtil.saveFiles(files);
+
+        productDTO.setUploadFileNames(uploadFileNames);
+
+        log.info(uploadFileNames);
+        Long pno = productService.register(productDTO);
+        return Map.of("result", pno);
+    }
+
+    @GetMapping("/{pno}")
+    public ProductDTO read(@PathVariable("pno") Long pno) {
+        return productService.get(pno);
+    }
     
     
 }
