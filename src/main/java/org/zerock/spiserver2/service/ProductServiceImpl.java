@@ -157,10 +157,4 @@ public class ProductServiceImpl implements  ProductService{
 
         return product;
     }
-
-    @Override
-    public void modify(ProductDTO productDTO) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'modify'");
-    }
 }
