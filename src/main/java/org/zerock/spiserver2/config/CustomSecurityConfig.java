@@ -14,6 +14,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.zerock.spiserver2.security.handler.APILoginFailHandler;
+import org.zerock.spiserver2.security.handler.APILoginSeccessHandler;
 
 import java.util.Arrays;
 
@@ -30,10 +32,16 @@ public class CustomSecurityConfig {
             httpSecurityCorsConfigurer.configurationSource(CorsConfigurationSource());
         });
 
+        http.sessionManagement(httpSecuritySessionManagementConfigurer -> {
+            httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.NEVER);
+        });
+
         http.csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable());
 
         http.formLogin(config -> {
             config.loginPage("/api/member/login");
+            config.successHandler(new APILoginSeccessHandler());
+            config.failureHandler(new APILoginFailHandler());
         });
 
         return http.build();
