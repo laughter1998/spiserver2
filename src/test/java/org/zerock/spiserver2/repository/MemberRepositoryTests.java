@@ -45,6 +45,6 @@ public class MemberRepositoryTests {
         Member member = memberRepository.getWithRoles(email);
         log.info("----------------");
         log.info(member);
-        
+
     }
 }
