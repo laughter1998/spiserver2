@@ -1,5 +1,6 @@
 package org.zerock.spiserver2.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -59,6 +60,9 @@ public class ProductContoller {
     public ResponseEntity<Resource> viewFileGet(@PathVariable("fileName") String fileName){
         return fileUtil.getFile(fileName);
     }
+
+//    @PreAuthorize("hasAnyRole('ROLE_USER','ROLE_ADMIN')") //임시로 권한 설정
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
 
     @GetMapping("/list")
     public PageResponseDTO<ProductDTO> List(PageRequestDTO pageRequestDTO){

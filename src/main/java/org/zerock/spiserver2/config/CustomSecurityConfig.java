@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,12 +19,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.zerock.spiserver2.security.filter.JWTCheckFilter;
 import org.zerock.spiserver2.security.handler.APILoginFailHandler;
 import org.zerock.spiserver2.security.handler.APILoginSeccessHandler;
+import org.zerock.spiserver2.security.handler.CustomAccessDeniedHandler;
 
 import java.util.Arrays;
 
 @Configuration
 @Log4j2
 @RequiredArgsConstructor
+@EnableMethodSecurity
+
 public class CustomSecurityConfig {
 
     @Bean
@@ -47,6 +51,10 @@ public class CustomSecurityConfig {
         });
 
         http.addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class);
+
+        http.exceptionHandling(config -> {
+           config.accessDeniedHandler(new CustomAccessDeniedHandler());
+        });
         return http.build();
     }
 
