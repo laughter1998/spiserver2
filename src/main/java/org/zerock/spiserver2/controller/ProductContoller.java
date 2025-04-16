@@ -62,7 +62,7 @@ public class ProductContoller {
     }
 
 //    @PreAuthorize("hasAnyRole('ROLE_USER','ROLE_ADMIN')") //임시로 권한 설정
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    // @PreAuthorize("hasRole('ROLE_ADMIN')")   // 일단 권한 삭제
 
     @GetMapping("/list")
     public PageResponseDTO<ProductDTO> List(PageRequestDTO pageRequestDTO){
