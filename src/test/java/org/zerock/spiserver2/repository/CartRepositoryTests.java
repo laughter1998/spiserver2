@@ -6,8 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
+import org.zerock.spiserver2.domain.Cart;
 import org.zerock.spiserver2.domain.CartItem;
+import org.zerock.spiserver2.domain.Member;
+import org.zerock.spiserver2.domain.Product;
+import org.zerock.spiserver2.dto.CartItemListDTO;
 
+import java.util.List;
 import java.util.Optional;
 
 @SpringBootTest
@@ -25,9 +30,9 @@ public class CartRepositoryTests {
     @Test
     public void testInsertByProduct() {
 
-        String email = "suer1@aaa.com";
-        Long pno = 5L;
-        int qty = 1;
+        String email = "user1@aaa.com";
+        Long pno = 6L;
+        int qty = 3;
 
         CartItem cartItem = cartItemRepository.getItemOfPno(email, pno);
         if(cartItem != null) {
@@ -35,14 +40,68 @@ public class CartRepositoryTests {
             cartItemRepository.save(cartItem);
             return;
         }
+
+        Optional<Cart> result = cartRepository.getCartOfMember(email);
+
+        Cart cart = null;
+
+        if(result.isEmpty()) {
+            Member member = Member.builder().email(email).build();
+            Cart tempCart = Cart.builder().owner(member).build();
+
+            cart = cartRepository.save(tempCart);
+        } else {
+            cart = result.get();
+        }
+
+        //if(cartItem == null) {
+            Product product = Product.builder().pno(pno).build();
+            cartItem = CartItem.builder().cart(cart).product(product).qty(qty).build();
+        //}
+
+        cartItemRepository.save(cartItem);
+
     }
 
     @Test
     public void testListOfMember() {
         String email = "user1@aaa.com";
 
-        cartItemRepository.getItemsOfCartDTOByEmail(email);
+        List<CartItemListDTO> cartItemListDTOList = cartItemRepository.getItemsOfCartDTOByEmail(email);
 
+        for ( CartItemListDTO dto:cartItemListDTOList){
+            log.info(dto);
+        }
+
+    }
+
+
+
+    @Transactional
+    @Commit
+    @Test
+    public void testUpdateByCino() {
+        Long cino = 2L;
+        int qty  = 4;
+        Optional<CartItem> result = cartItemRepository.findById(cino);
+        CartItem cartItem = result.orElseThrow();
+
+        cartItem.changeQty(qty);
+        cartItemRepository.save(cartItem);
+    }
+
+    @Test
+    public void testDeleteThenList() {
+        Long cino = 2L;
+        Long cno = cartItemRepository.getCartFromItem(cino);
+
+        cartItemRepository.deleteById(cino);
+
+        List<CartItemListDTO> cartItemList = cartItemRepository.getItemsOfCartDTOByCart(cno);
+
+        for (CartItemListDTO dto: cartItemList){
+            log.info(dto);
+        }
     }
 
 }
